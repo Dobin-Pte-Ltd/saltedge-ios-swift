@@ -112,7 +112,7 @@ class SEConnectionFetcher {
     }
     
     private static func requestPolling(for connection: SEConnection, fetchingDelegate: SEConnectionFetchingDelegate) {
-        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + SEConnectionFetcher.pollingInterval, execute: {
+        DispatchQueue.global(qos: .background).asyncAfter(wallDeadline: .now() + SEConnectionFetcher.pollingInterval, execute: {
             self.pollConnection(connection.secret, fetchingDelegate: fetchingDelegate)
         })
     }
