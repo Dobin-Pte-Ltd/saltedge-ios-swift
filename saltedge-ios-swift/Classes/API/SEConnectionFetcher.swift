@@ -113,7 +113,7 @@ class SEConnectionFetcher {
     }
     
     private static func requestPolling(for connection: SEConnection, fetchingDelegate: SEConnectionFetchingDelegate) {
-        fetchingDelegate.logMessage("SALTEDGE - \(connection.providerId) - SHOULD POLL CONNECTION IN \(SEConnectionFetcher.pollingInterval) SECONDS")
+        fetchingDelegate.logMessage("SALTEDGE - \(connection.providerCode) - SHOULD POLL CONNECTION IN \(SEConnectionFetcher.pollingInterval) SECONDS")
         DispatchQueue.global(qos: .background).asyncAfter(wallDeadline: .now() + SEConnectionFetcher.pollingInterval, execute: {
             self.pollConnection(connection.secret, fetchingDelegate: fetchingDelegate)
         })
