@@ -55,4 +55,6 @@ public protocol SEConnectionFetchingDelegate: class {
      Sent to delegate when the intermediate conneciton stage changes (not error, success or interactive)
      */
     func connectionStageDidChange(_ connection: SEConnection)
+    
+    func logMessage(_ message: String)
 }

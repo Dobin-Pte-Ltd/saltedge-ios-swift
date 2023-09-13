@@ -23,6 +23,7 @@
 
 import Foundation
 
+
 class SEConnectionFetcher {
     private static let pollingInterval: Double = 3.0
 
@@ -112,17 +113,22 @@ class SEConnectionFetcher {
     }
     
     private static func requestPolling(for connection: SEConnection, fetchingDelegate: SEConnectionFetchingDelegate) {
+        fetchingDelegate.logMessage("SALTEDGE - \(connection.providerId) - SHOULD POLL CONNECTION IN \(SEConnectionFetcher.pollingInterval) SECONDS")
         DispatchQueue.global(qos: .background).asyncAfter(wallDeadline: .now() + SEConnectionFetcher.pollingInterval, execute: {
             self.pollConnection(connection.secret, fetchingDelegate: fetchingDelegate)
         })
     }
     
     private static func pollConnection(_ connectionSecret: String, fetchingDelegate: SEConnectionFetchingDelegate) {
+        
+        fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION")
         HTTPService<SEConnection>.makeRequest(ConnectionRouter.show(connectionSecret)) { response in
             switch response {
             case .success(let value):
+                fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION SUCCESS")
                 self.handleSuccessPollResponse(for: value.data, fetchingDelegate: fetchingDelegate)
             case .failure(let error):
+                fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION FAILED")
                 fetchingDelegate.failedToFetch(connection: nil, message: error.localizedDescription)
             }
         }
