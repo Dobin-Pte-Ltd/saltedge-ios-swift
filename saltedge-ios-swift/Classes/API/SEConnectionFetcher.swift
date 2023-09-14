@@ -129,7 +129,7 @@ class SEConnectionFetcher {
                 self.handleSuccessPollResponse(for: value.data, fetchingDelegate: fetchingDelegate)
             case .failure(let error):
                 fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION FAILED")
-                fetchingDelegate.failedToFetch(connection: nil, message: error.localizedDescription)
+                fetchingDelegate.failedToFetch(connection: nil, connectionSecret: connectionSecret, message: error.localizedDescription)
             }
         }
     }

@@ -32,9 +32,10 @@ public protocol SEConnectionFetchingDelegate: class {
      
      - parameters:
          - connection: The connection which failed to fetch.
+            - connectionSecret: added by Erwan to identify which connection failed at the delegate level
          - message: The reason why the connection failed to fetch.
      */
-    func failedToFetch(connection: SEConnection?, message: String)
+    func failedToFetch(connection: SEConnection?, connectionSecret: String?, message: String)
     
     /**
      This message is sent to the delegate when the connection has required interactive user input.
