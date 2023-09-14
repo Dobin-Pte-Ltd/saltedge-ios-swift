@@ -141,7 +141,7 @@ class SEConnectionFetcher {
             fetchingDelegate.interactiveInputRequested(for: connection)
         case "finish":
             if let message = connection.failMessage {
-                fetchingDelegate.failedToFetch(connection: connection, message: message)
+                fetchingDelegate.failedToFetch(connection: connection, connectionSecret: nil, message: message)
             } else {
                 fetchingDelegate.successfullyFinishedFetching(connection: connection)
             }
