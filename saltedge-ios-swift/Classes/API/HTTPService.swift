@@ -126,7 +126,7 @@ func handleResponse(from data: Data?, error: Error?, decoder: JSONDecoder) -> (D
     }
 
     // NOTE: Uncomment this to debug response data
-    // print("Error Response: ", String(data: jsonData, encoding: .utf8))
+    print("Saltedge Response: ", String(data: jsonData, encoding: .utf8))
 
     if let error = try? decoder.decode(SEError.self, from: jsonData) {
         let err = NSError(domain: error.errorClass, code: 0, userInfo: [NSLocalizedDescriptionKey : error.errorMessage]) as Error
