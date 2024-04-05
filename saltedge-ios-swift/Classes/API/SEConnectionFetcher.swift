@@ -131,8 +131,8 @@ class SEConnectionFetcher {
                 // ignore error if:
                 // Error Domain=NSURLErrorDomain Code=-1005 "The network connection was lost."
                 // will just try to poll again
-                if (error as NSError).code == -1005 || error.localizedDescription == "The network connection was lost." {
-                    fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION LOST - WILL RETRY in 5 sec")
+                if (error as NSError).code == -1005 ||  error.localizedDescription == "The network connection was lost." || (error as NSError).code == -1001 ||  error.localizedDescription == "The request timed out." {
+                    fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION LOST / TIMED OUT - WILL RETRY in 5 sec")
                     DispatchQueue.global(qos: .background).asyncAfter(wallDeadline: .now() + SEConnectionFetcher.pollingInterval, execute: {
                         self.pollConnection(connectionSecret, fetchingDelegate: fetchingDelegate)
                     })
