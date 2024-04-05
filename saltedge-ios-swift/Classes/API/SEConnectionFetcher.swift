@@ -26,7 +26,9 @@ import Foundation
 
 class SEConnectionFetcher {
     private static let pollingInterval: Double = 3.0
-
+    private static var pollingRetryCount: Int = 0
+    private static let pollingRetryMax: Int = 10
+    
     static func createConnection(
         with params: SEConnectionParams,
         fetchingDelegate: SEConnectionFetchingDelegate,
@@ -124,20 +126,29 @@ class SEConnectionFetcher {
         fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION")
         HTTPService<SEConnection>.makeRequest(ConnectionRouter.show(connectionSecret)) { response in
             switch response {
+                
             case .success(let value):
+                pollingRetryCount = 0
                 fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION SUCCESS")
                 self.handleSuccessPollResponse(for: value.data, fetchingDelegate: fetchingDelegate)
+                
             case .failure(let error):
                 // ignore error if:
                 // Error Domain=NSURLErrorDomain Code=-1005 "The network connection was lost."
                 // will just try to poll again
-                if (error as NSError).code == -1005 ||  error.localizedDescription == "The network connection was lost." || (error as NSError).code == -1001 ||  error.localizedDescription == "The request timed out." {
-                    fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION LOST / TIMED OUT - WILL RETRY in 5 sec")
+                if pollingRetryCount < pollingRetryMax &&
+                    ((error as NSError).code == -1005 ||  error.localizedDescription == "The network connection was lost." || (error as NSError).code == -1001 ||  error.localizedDescription == "The request timed out.") {
+                    
+                    pollingRetryCount += 1
+                    
+                    fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION LOST / TIMED OUT - WILL RETRY (\(pollingRetryCount)) in 5 sec")
+                    
                     DispatchQueue.global(qos: .background).asyncAfter(wallDeadline: .now() + SEConnectionFetcher.pollingInterval, execute: {
                         self.pollConnection(connectionSecret, fetchingDelegate: fetchingDelegate)
                     })
                     
                 } else {
+                    pollingRetryCount = 0
                     fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION FAILED")
                     fetchingDelegate.failedToFetch(connection: nil, connectionSecret: connectionSecret, message: error.localizedDescription)
                 }
