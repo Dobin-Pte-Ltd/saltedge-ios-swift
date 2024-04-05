@@ -128,8 +128,19 @@ class SEConnectionFetcher {
                 fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION SUCCESS")
                 self.handleSuccessPollResponse(for: value.data, fetchingDelegate: fetchingDelegate)
             case .failure(let error):
-                fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION FAILED")
-                fetchingDelegate.failedToFetch(connection: nil, connectionSecret: connectionSecret, message: error.localizedDescription)
+                // ignore error if:
+                // Error Domain=NSURLErrorDomain Code=-1005 "The network connection was lost."
+                // will just try to poll again
+                if (error as NSError).code == -1005 || error.localizedDescription == "The network connection was lost." {
+                    fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION LOST - WILL RETRY in 5 sec")
+                    DispatchQueue.global(qos: .background).asyncAfter(wallDeadline: .now() + SEConnectionFetcher.pollingInterval, execute: {
+                        self.pollConnection(connectionSecret, fetchingDelegate: fetchingDelegate)
+                    })
+                    
+                } else {
+                    fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION FAILED")
+                    fetchingDelegate.failedToFetch(connection: nil, connectionSecret: connectionSecret, message: error.localizedDescription)
+                }
             }
         }
     }
