@@ -299,13 +299,13 @@ public class SERequestManager {
                 SERequestManager.shared.getConnection(with: connectionSecret) { response in
                     switch response {
                     case .success(let value):
-                        connectionFetchingDelegate.failedToFetch(connection: value.data, connectionSecret:nil, message: errorMessage)
+                        connectionFetchingDelegate.failedToFetch(connection: value.data, connectionSecret:nil, message: errorMessage, systemDescription: nil)
                     case .failure(_):
-                        connectionFetchingDelegate.failedToFetch(connection: nil, connectionSecret:connectionSecret, message: errorMessage)
+                        connectionFetchingDelegate.failedToFetch(connection: nil, connectionSecret:connectionSecret, message: errorMessage, systemDescription: nil)
                     }
                 }
             } else {
-                connectionFetchingDelegate.failedToFetch(connection: nil, connectionSecret: nil, message: errorMessage)
+                connectionFetchingDelegate.failedToFetch(connection: nil, connectionSecret: nil, message: errorMessage, systemDescription: nil)
             }
         } else {
             guard let connectionSecret = parameters["connection_secret"] else { return }

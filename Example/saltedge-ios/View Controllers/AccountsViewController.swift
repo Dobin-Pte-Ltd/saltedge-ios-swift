@@ -257,10 +257,11 @@ extension AccountsViewController {
 }
 
 extension AccountsViewController: SEConnectionFetchingDelegate {
-    func failedToFetch(connection: SEConnection?, message: String) {
+    
+    func failedToFetch(connection: SEConnection?, connectionSecret: String?, message: String, systemDescription: String?) {
         HUD.flash(.labeledError(title: "Error", subtitle: message), delay: 3.0)
     }
-
+    
     func interactiveInputRequested(for connection: SEConnection) {
         guard let lastStage = connection.lastAttempt.lastStage else { return }
 

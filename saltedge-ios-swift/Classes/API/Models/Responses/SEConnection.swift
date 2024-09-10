@@ -44,6 +44,8 @@ public struct SEConnection: Decodable {
     public let updatedAt: Date
     public let customerId: String
     
+    var lastAttemptResponse: String?
+    
     enum CodingKeys: String, CodingKey {
         case id = "id"
         case countryCode = "country_code"
@@ -64,6 +66,38 @@ public struct SEConnection: Decodable {
         case storeCredentials = "store_credentials"
         case updatedAt = "updated_at"
         case customerId = "customer_id"
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(String.self, forKey: .id)
+        self.countryCode = try container.decode(String.self, forKey: .countryCode)
+        self.createdAt = try container.decode(Date.self, forKey: .createdAt)
+        self.dailyRefresh = try container.decode(Bool.self, forKey: .dailyRefresh)
+        self.showConsentConfirmation = try container.decodeIfPresent(Bool.self, forKey: .showConsentConfirmation)
+        self.consentTypes = try container.decodeIfPresent([String].self, forKey: .consentTypes)
+        self.consentGivenAt = try container.decodeIfPresent(Date.self, forKey: .consentGivenAt)
+        self.lastAttempt = try container.decode(SEAttempt.self, forKey: .lastAttempt)
+        
+        if let _lastAttemptErrorResponse = try container.decodeIfPresent(String.self, forKey: .lastAttempt) {
+            lastAttemptResponse = _lastAttemptErrorResponse
+        } else if let _lastAttemptErrorResponse = try container.decodeIfPresent([String: Any].self, forKey: .lastAttempt) {
+            lastAttemptResponse = _lastAttemptErrorResponse.description
+        }
+        
+        self.holderInfo = try container.decodeIfPresent(SEHolderInfo.self, forKey: .holderInfo)
+        self.lastSuccessAt = try container.decodeIfPresent(Date.self, forKey: .lastSuccessAt)
+        self.nextRefreshPossibleAt = try container.decodeIfPresent(Date.self, forKey: .nextRefreshPossibleAt)
+        self.providerId = try container.decode(String.self, forKey: .providerId)
+        self.providerCode = try container.decode(String.self, forKey: .providerCode)
+        self.providerName = try container.decode(String.self, forKey: .providerName)
+        self.secret = try container.decode(String.self, forKey: .secret)
+        self.status = try container.decode(String.self, forKey: .status)
+        self.storeCredentials = try container.decode(Bool.self, forKey: .storeCredentials)
+        self.updatedAt = try container.decode(Date.self, forKey: .updatedAt)
+        self.customerId = try container.decode(String.self, forKey: .customerId)
+        
+        
     }
     
     var stage: String {
