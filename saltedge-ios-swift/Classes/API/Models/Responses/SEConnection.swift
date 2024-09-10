@@ -79,9 +79,9 @@ public struct SEConnection: Decodable {
         self.consentGivenAt = try container.decodeIfPresent(Date.self, forKey: .consentGivenAt)
         self.lastAttempt = try container.decode(SEAttempt.self, forKey: .lastAttempt)
         
-        if let _lastAttemptErrorResponse = try container.decodeIfPresent(String.self, forKey: .lastAttempt) {
+        if let _lastAttemptErrorResponse = try? container.decodeIfPresent(String.self, forKey: .lastAttempt) {
             lastAttemptResponse = _lastAttemptErrorResponse
-        } else if let _lastAttemptErrorResponse = try container.decodeIfPresent([String: Any].self, forKey: .lastAttempt) {
+        } else if let _lastAttemptErrorResponse = try? container.decodeIfPresent([String: Any].self, forKey: .lastAttempt) {
             lastAttemptResponse = _lastAttemptErrorResponse.description
         }
         
