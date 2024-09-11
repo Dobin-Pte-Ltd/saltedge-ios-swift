@@ -150,7 +150,7 @@ class SEConnectionFetcher {
                 } else {
                     pollingRetryCount = 0
                     fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION FAILED")
-                    fetchingDelegate.failedToFetch(connection: nil, connectionSecret: connectionSecret, message: error.localizedDescription)
+                    fetchingDelegate.failedToFetch(connection: nil, connectionSecret: connectionSecret, message: error.localizedDescription, systemDescription: nil)
                 }
             }
         }
@@ -163,7 +163,7 @@ class SEConnectionFetcher {
             fetchingDelegate.interactiveInputRequested(for: connection)
         case "finish":
             if let message = connection.failMessage {
-                fetchingDelegate.failedToFetch(connection: connection, connectionSecret: nil, message: message)
+                fetchingDelegate.failedToFetch(connection: connection, connectionSecret: nil, message: message, systemDescription: connection.lastAttemptResponse)
             } else {
                 fetchingDelegate.successfullyFinishedFetching(connection: connection)
             }

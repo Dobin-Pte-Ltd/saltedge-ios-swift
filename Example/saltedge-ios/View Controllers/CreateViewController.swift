@@ -242,7 +242,8 @@ class CreateViewController: UIViewController {
 }
 
 extension CreateViewController: SEConnectionFetchingDelegate {
-    func failedToFetch(connection: SEConnection?, message: String) {
+   
+    func failedToFetch(connection: SEConnection?, connectionSecret: String?, message: String, systemDescription: String?) {
         HUD.flash(.labeledError(title: "Error", subtitle: message), delay: 3.0)
     }
     
