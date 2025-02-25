@@ -29,6 +29,10 @@ class SEConnectionFetcher {
     private static var pollingRetryCount: Int = 0
     private static let pollingRetryMax: Int = 10
     
+    static func setPollingRetryCountToMax() {
+        pollingRetryCount = pollingRetryMax
+    }
+    
     static func createConnection(
         with params: SEConnectionParams,
         fetchingDelegate: SEConnectionFetchingDelegate,
@@ -111,12 +115,14 @@ class SEConnectionFetcher {
     }
     
     static func handleOAuthConnection(connectionSecret: String, fetchingDelegate: SEConnectionFetchingDelegate) {
+        pollingRetryCount = 0
         self.pollConnection(connectionSecret, fetchingDelegate: fetchingDelegate)
     }
     
     private static func requestPolling(for connection: SEConnection, fetchingDelegate: SEConnectionFetchingDelegate) {
         fetchingDelegate.logMessage("SALTEDGE - \(connection.providerCode) - SHOULD POLL CONNECTION IN \(SEConnectionFetcher.pollingInterval) SECONDS")
         DispatchQueue.global(qos: .background).asyncAfter(wallDeadline: .now() + SEConnectionFetcher.pollingInterval, execute: {
+            pollingRetryCount = 0
             self.pollConnection(connection.secret, fetchingDelegate: fetchingDelegate)
         })
     }
@@ -142,7 +148,7 @@ class SEConnectionFetcher {
                     pollingRetryCount += 1
                     
                     fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION LOST / TIMED OUT - WILL RETRY (\(pollingRetryCount)) in 5 sec")
-                    
+                    fetchingDelegate.failedToFetch(connection: nil, connectionSecret: connectionSecret, message: error.localizedDescription, systemDescription: nil, isRetrying: true)
                     DispatchQueue.global(qos: .background).asyncAfter(wallDeadline: .now() + SEConnectionFetcher.pollingInterval, execute: {
                         self.pollConnection(connectionSecret, fetchingDelegate: fetchingDelegate)
                     })
@@ -150,7 +156,7 @@ class SEConnectionFetcher {
                 } else {
                     pollingRetryCount = 0
                     fetchingDelegate.logMessage("SALTEDGE POLLING CONNECTION FAILED")
-                    fetchingDelegate.failedToFetch(connection: nil, connectionSecret: connectionSecret, message: error.localizedDescription, systemDescription: nil)
+                    fetchingDelegate.failedToFetch(connection: nil, connectionSecret: connectionSecret, message: error.localizedDescription, systemDescription: nil, isRetrying: false)
                 }
             }
         }
@@ -163,7 +169,7 @@ class SEConnectionFetcher {
             fetchingDelegate.interactiveInputRequested(for: connection)
         case "finish":
             if let message = connection.failMessage {
-                fetchingDelegate.failedToFetch(connection: connection, connectionSecret: nil, message: message, systemDescription: connection.lastAttemptResponse)
+                fetchingDelegate.failedToFetch(connection: connection, connectionSecret: nil, message: message, systemDescription: connection.lastAttemptResponse, isRetrying: false)
             } else {
                 fetchingDelegate.successfullyFinishedFetching(connection: connection)
             }
