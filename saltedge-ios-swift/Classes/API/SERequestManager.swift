@@ -40,6 +40,10 @@ public class SERequestManager {
         SEHeaders.cached.set(appId: appId, appSecret: appSecret)
     }
     
+    public func setPollingRetryCountToMax() {
+        SEConnectionFetcher.setPollingRetryCountToMax()
+    }
+    
     /**
      Links your Customer Secret to the request manager. All outgoing requests related to Connections will have the proper customer-related HTTP headers set by default.
      
